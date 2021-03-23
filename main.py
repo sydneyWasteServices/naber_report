@@ -48,12 +48,12 @@ waste_sd = {
     "0.66" : 132
 },
 "Organics" : {
-    "0.12" : 24,
-    "0.24" : 48
+    "0.12" : 33.6,
+    "0.24" : 67.2
 }
 }
 
-path = "../../ubuntuShareDrive/Datasets/Nabour_report_ds/2020_1.csv"
+path = "../../ubuntuShareDrive/Datasets/Nabour_report_ds/1825.csv"
 
 df = pd.read_csv(path, dtype={"Customer number": np.float64 ,"Schd Time Start": str, "PO": str, 'PostCode': str})
 
@@ -65,8 +65,8 @@ others = df[df['Customer number'].isin([1887,3763,3268,3483,2317,4236,3476,4156,
 df_4138 = df.loc[(df['Customer number'] > 4138.000) & (df['Customer number'] <= 4138.1)]
 df_1021 = df.loc[(df['Customer number'] > 1021.000) & (df['Customer number'] <= 1021.1)]
 df_2505 = df.loc[(df['Customer number'] > 2505.000) & (df['Customer number'] <= 2505.1)]
-
 df_3139 = df.loc[(df['Customer number'] >= 3139.000) & (df['Customer number'] <= 3139.1)]
+
 
 # 4138 group 
 df_4138_group = df_4138.groupby('Customer number')
@@ -90,10 +90,16 @@ df_3139_group = df_3139.groupby('Customer number')
 df_3139_group_keys = list(df_3139_group.indices.keys()) 
 # =====================================================================
 
+# =======================================================
+# df From Own database
+df_1825 = df.groupby('Customer number')
+df_1825_key = list(df_1825.indices.keys()) 
+# =======================================================
 
-for customer_key in df_3139_group_keys:
 
-    naber_df = df_3139_group.get_group(customer_key)
+for customer_key in df_1825_key:
+
+    naber_df = df_1825.get_group(customer_key)
 
     # Pick address as File name
     # in case There is more than 1 address in that customer
@@ -176,11 +182,14 @@ for customer_key in df_3139_group_keys:
     
     naber_df['Site Address (StreetNumber Street Name, Suburb, State, Postcode)'] = naber_df[['Address 1','City','State','PostCode']].agg(','.join, axis=1)
 # ==========================================================================
+    # Date Format is change per dataframe
     # Sort by Date
 
     # naber_df['Date'] = pd.to_datetime(naber_df['Date'], format='%d/%m/%y')
 
-    naber_df['Date'] = pd.to_datetime(naber_df['Date'], format='%d/%m/%Y')
+    # naber_df['Date'] = pd.to_datetime(naber_df['Date'], format='%d/%m/%Y')
+    
+    naber_df['Date'] = pd.to_datetime(naber_df['Date'], format='%Y-%m-%d')
     
     naber_df.sort_values(["Date"],ascending=True, inplace=True)
 
